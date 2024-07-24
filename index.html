@@ -542,34 +542,43 @@
                 requestAnimationFrame(updateProgressBar);
             }
         }
-
+        
+        let sound;
+        let currentSongIndex = 0;
+        
         function playSong() {
-            if (sound) sound.stop();
-            sound = new Howl({
-                src: [playlist[currentSongIndex].file],
-                html5: true,
-                onplay: () => {
-                    requestAnimationFrame(updateProgressBar);
-                    playBtn.style.display = 'none';
-                    pauseBtn.style.display = 'inline-block';
-                },
-                onload: () => {
-                    const duration = document.getElementById('duration');
-                    duration.textContent = formatTime(sound.duration());
-                },
-                onend: nextSong,
-                onloaderror: (id, error) => {
-                    console.error('Error loading audio:', error);
-                    alert(`Error loading audio: ${playlist[currentSongIndex].title}. Please check the file path.`);
-                }
-            });
-            sound.play();
+            if (sound && sound.playing()) {
+                sound.play(); // Resume if already loaded and was paused
+            } else {
+                if (sound) sound.unload(); // Unload previous sound if exists
+                sound = new Howl({
+                    src: [playlist[currentSongIndex].file],
+                    html5: true,
+                    onplay: () => {
+                        requestAnimationFrame(updateProgressBar);
+                        playBtn.style.display = 'none';
+                        pauseBtn.style.display = 'inline-block';
+                    },
+                    onload: () => {
+                        const duration = document.getElementById('duration');
+                        duration.textContent = formatTime(sound.duration());
+                    },
+                    onend: nextSong,
+                    onloaderror: (id, error) => {
+                        console.error('Error loading audio:', error);
+                        alert(`Error loading audio: ${playlist[currentSongIndex].title}. Please check the file path.`);
+                    }
+                });
+                sound.play();
+            }
         }
-
+        
         function pauseSong() {
-            if (sound) sound.pause();
-            playBtn.style.display = 'inline-block';
-            pauseBtn.style.display = 'none';
+            if (sound) {
+                sound.pause();
+                playBtn.style.display = 'inline-block';
+                pauseBtn.style.display = 'none';
+            }
         }
 
         function nextSong() {
