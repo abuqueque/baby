@@ -155,26 +155,7 @@
             font-size: 0.7rem;
             color: #666;
         }
-        .letters {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-            width: 100%;
-        }
-        .letter-btn {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 0.8rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            font-size: 0.9rem;
-        }
-        .letter-btn:hover {
-            background-color: #0056b3;
-        }
+
         .modal {
             display: none;
             position: fixed;
@@ -185,15 +166,7 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
         }
-        .modal-content {
-            background-color: #fff;
-            margin: 10% auto;
-            padding: 1.5rem;
-            border-radius: 12px;
-            max-width: 90%;
-            width: 90%;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+
         .close {
             color: #aaa;
             float: right;
@@ -282,6 +255,73 @@
             left: 7.5px;
             top: 0;
         }
+        .envelope {
+            width: 200px;
+            height: 120px;
+            background-color: #f0f0f0;
+            position: relative;
+            margin: 20px auto;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope:hover {
+            transform: scale(1.05);
+        }
+
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-top: 60px solid #e0e0e0;
+        }
+
+        .envelope::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 60px solid #d0d0d0;
+        }
+
+        .envelope-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            font-size: 24px;
+            color: #333;
+        }
+
+        /* Update modal styles */
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 1.5rem;
+            border-radius: 12px;
+            max-width: 90%;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .letter-text {
+            margin-top: 1rem;
+            font-size: 1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 <body>
@@ -312,6 +352,16 @@
                 </div>
             </div>
             <div class="letters" id="letterButtons"></div>
+        </div>
+    </div>
+
+    <div id="letterModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p class="letter-text" id="letterText"></p>
+        </div>
+        <div class="envelope" id="envelopeBtn">
+            <div class="envelope-content">💌</div>
         </div>
     </div>
 
@@ -410,9 +460,11 @@
         ];
 
         const letters = [
-            "My dearest, your love fills my heart with joy every single day...",
-            "Remember when we first met? That moment changed my life forever...",
-            "Your smile brightens my world. I'm so grateful to have you in my life..."
+            "My dearest,\n\nYour love fills my heart with joy every single day. From the moment I wake up to the moment I fall asleep, thoughts of you bring a smile to my face. You are the light that brightens even my darkest days, and I am so grateful to have you in my life.\n\nHappy birthday, my love. May this day be as special and wonderful as you are.\n\nForever yours,\n[Your Name]",
+            
+            "My love,\n\nDo you remember when we first met? That moment changed my life forever. Your smile, your laugh, the way your eyes lit up – I knew right then that you were someone special. Since that day, every moment with you has been a blessing.\n\nOn your birthday, I want you to know how much you mean to me. You're not just my partner; you're my best friend, my confidant, and my soulmate.\n\nHappy birthday, sweetheart. Here's to many more years of love and laughter.\n\nAll my love,\n[Your Name]",
+            
+            "To my beautiful [Partner's Name],\n\nYour smile brightens my world in ways I never thought possible. It's the first thing I want to see every morning and the last thing I want to see every night. Your love has given my life new meaning and purpose.\n\nOn this special day, I want to remind you of how amazing you are. Your kindness, your strength, your passion – every part of you is perfect to me.\n\nHappy birthday, my love. I can't wait to celebrate many more with you.\n\nLove always,\n[Your Name]"
         ];
 
         let currentSongIndex = 0;
@@ -526,16 +578,13 @@
         setInterval(nextPhoto, 5000);
         showPhoto(currentPhotoIndex);
 
-        const letterButtonsContainer = document.getElementById('letterButtons');
-        letters.forEach((letter, index) => {
-            const button = document.createElement('button');
-            button.classList.add('letter-btn');
-            button.textContent = `Letter ${index + 1}`;
-            button.addEventListener('click', () => {
-                document.getElementById('letterText').textContent = letter;
-                document.getElementById('letterModal').style.display = 'block';
-            });
-            letterButtonsContainer.appendChild(button);
+        const envelopeBtn = document.getElementById('envelopeBtn');
+        let currentLetterIndex = 0;
+
+        envelopeBtn.addEventListener('click', () => {
+            document.getElementById('letterText').textContent = letters[currentLetterIndex];
+            document.getElementById('letterModal').style.display = 'block';
+            currentLetterIndex = (currentLetterIndex + 1) % letters.length;
         });
 
         document.querySelector('.modal .close').addEventListener('click', () => {
