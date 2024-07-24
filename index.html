@@ -322,6 +322,45 @@
             line-height: 1.6;
             white-space: pre-wrap;
         }
+           @keyframes float {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+        .heart {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            background-color: red;
+            transform: rotate(-45deg);
+            animation: float 10s linear infinite;
+            top: -15px; /* Start above the viewport */
+        }
+        .heart::before,
+        .heart::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: red;
+            border-radius: 50%;
+        }
+        .heart::before {
+            top: -7.5px;
+            left: 0;
+        }
+        .heart::after {
+            left: 7.5px;
+            top: 0;
+        }
     </style>
 </head>
 <body>
@@ -436,6 +475,22 @@
 
 
     <script>
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 3 + 7) + 's'; // Between 7 and 10 seconds
+            document.body.appendChild(heart);
+
+            // Remove the heart after animation completes
+            setTimeout(() => {
+                heart.remove();
+            }, 10000);
+        }
+
+        // Create a new heart every 300ms
+        setInterval(createHeart, 300);
+        
         const playlist = [
         { title: "在这座城市遗失了你", artist: "告五人", file: "在這座城市遺失了你.mp3" },
         { title: "女孩", artist: "韦礼安", file: "女孩.mp3" },
