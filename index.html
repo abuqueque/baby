@@ -475,21 +475,38 @@
 
 
     <script>
-        function createHeart() {
+        function createInitialHearts() {
+            for (let i = 0; i < 20; i++) {
+                createHeart(true);
+            }
+        }
+        function createHeart(isInitial = false) {
             const heart = document.createElement('div');
             heart.classList.add('heart');
             heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = (Math.random() * 3 + 7) + 's'; // Between 7 and 10 seconds
+            
+            // For initial hearts, start them from different positions
+            if (isInitial) {
+                heart.style.top = Math.random() * 100 + 'vh';
+            }
+            
+            heart.style.animationDuration = (Math.random() * 3 + 7) + 's';
+            // For initial hearts, reduce or remove the animation delay
+            if (isInitial) {
+                heart.style.animationDelay = Math.random() * 2 + 's';
+            }
             document.body.appendChild(heart);
-
-            // Remove the heart after animation completes
+        
             setTimeout(() => {
                 heart.remove();
             }, 10000);
         }
-
-        // Create a new heart every 300ms
-        setInterval(createHeart, 300);
+        
+        // Call this function when the page loads
+        createInitialHearts();
+        
+        // Reduce the interval time (e.g., from 300ms to 200ms)
+        setInterval(createHeart, 200);
         
         const playlist = [
         { title: "在这座城市遗失了你", artist: "告五人", file: "在這座城市遺失了你.mp3" },
