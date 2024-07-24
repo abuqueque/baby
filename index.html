@@ -481,17 +481,7 @@
             heart.style.left = Math.random() * 100 + 'vw';
             heart.style.animationDuration = (Math.random() * 3 + 7) + 's'; // Between 7 and 10 seconds
             document.body.appendChild(heart);
-
-            // Remove the heart after animation completes
-            setTimeout(() => {
-                heart.remove();
-            }, 10000);
-        }
-
-        // Create a new heart every 300ms
-        setInterval(createHeart, 300);
-        
-        const playlist = [
+const playlist = [
         { title: "在这座城市遗失了你", artist: "告五人", file: "在這座城市遺失了你.mp3" },
         { title: "女孩", artist: "韦礼安", file: "女孩.mp3" },
         { title: "慢慢等", artist: "韦礼安", file: "慢慢等.mp3" },
@@ -499,156 +489,152 @@
         { title: "不是因为天气晴朗才爱你", artist: "理想混蛋", file: "不是因為天氣晴朗才愛你.mp3" }
     ];
 
-        const photos = [
-            "IMG_8273.JPEG",
-            "image2.JPEG",
-            "photo3.jpg"
-        ];
+    const photos = [
+        "IMG_8273.JPEG",
+        "image2.JPEG",
+        "photo3.jpg"
+    ];
 
-        const letters = [
-            "My dearest,\n\nYour love fills my heart with joy every single day. From the moment I wake up to the moment I fall asleep, thoughts of you bring a smile to my face. You are the light that brightens even my darkest days, and I am so grateful to have you in my life.\n\nHappy birthday, my love. May this day be as special and wonderful as you are.\n\nForever yours,\n[Your Name]",
-            
-            "My love,\n\nDo you remember when we first met? That moment changed my life forever. Your smile, your laugh, the way your eyes lit up – I knew right then that you were someone special. Since that day, every moment with you has been a blessing.\n\nOn your birthday, I want you to know how much you mean to me. You're not just my partner; you're my best friend, my confidant, and my soulmate.\n\nHappy birthday, sweetheart. Here's to many more years of love and laughter.\n\nAll my love,\n[Your Name]",
-            
-            "To my beautiful [Partner's Name],\n\nYour smile brightens my world in ways I never thought possible. It's the first thing I want to see every morning and the last thing I want to see every night. Your love has given my life new meaning and purpose.\n\nOn this special day, I want to remind you of how amazing you are. Your kindness, your strength, your passion – every part of you is perfect to me.\n\nHappy birthday, my love. I can't wait to celebrate many more with you.\n\nLove always,\n[Your Name]"
-        ];
+    const letters = [
+        // ... (keep your letters as they are)
+    ];
 
-        let currentSongIndex = 0;
-        let sound;
-        let currentPhotoIndex = 0;
+    let currentSongIndex = 0;
+    let sound;
+    let currentPhotoIndex = 0;
+    let currentTime = 0;
 
-        function formatTime(secs) {
-            const minutes = Math.floor(secs / 60);
-            const seconds = Math.floor(secs % 60);
-            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    function formatTime(secs) {
+        const minutes = Math.floor(secs / 60);
+        const seconds = Math.floor(secs % 60);
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function updatePlayerInfo() {
+        document.getElementById('songTitle').textContent = playlist[currentSongIndex].title;
+        document.getElementById('artistName').textContent = playlist[currentSongIndex].artist;
+    }
+
+    function updateProgressBar() {
+        const progressBar = document.getElementById('progressBar');
+        const currentTime = document.getElementById('currentTime');
+        const duration = document.getElementById('duration');
+
+        if (sound) {
+            const seek = sound.seek() || 0;
+            const totalDuration = sound.duration() || 0;
+            progressBar.style.width = `${(seek / totalDuration) * 100}%`;
+            currentTime.textContent = formatTime(seek);
+            duration.textContent = formatTime(totalDuration);
+            requestAnimationFrame(updateProgressBar);
         }
+    }
 
-        function updatePlayerInfo() {
-            document.getElementById('songTitle').textContent = playlist[currentSongIndex].title;
-            document.getElementById('artistName').textContent = playlist[currentSongIndex].artist;
+    function playSong() {
+        if (sound) {
+            sound.stop();
         }
-
-        function updateProgressBar() {
-            const progressBar = document.getElementById('progressBar');
-            const currentTime = document.getElementById('currentTime');
-            const duration = document.getElementById('duration');
-
-            if (sound) {
-                const seek = sound.seek() || 0;
-                const totalDuration = sound.duration() || 0;
-                progressBar.style.width = `${(seek / totalDuration) * 100}%`;
-                currentTime.textContent = formatTime(seek);
-                duration.textContent = formatTime(totalDuration);
+        sound = new Howl({
+            src: [playlist[currentSongIndex].file],
+            html5: true,
+            onplay: () => {
                 requestAnimationFrame(updateProgressBar);
-            }
-        }
-
-        let sound;
-        let currentTime = 0;
-        
-        function playSong() {
-            if (sound) {
-                sound.stop();
-            }
-            sound = new Howl({
-                src: [playlist[currentSongIndex].file],
-                html5: true,
-                onplay: () => {
-                    requestAnimationFrame(updateProgressBar);
-                    playBtn.style.display = 'none';
-                    pauseBtn.style.display = 'inline-block';
-                },
-                onload: () => {
-                    const duration = document.getElementById('duration');
-                    duration.textContent = formatTime(sound.duration());
-                    if (currentTime > 0) {
-                        sound.seek(currentTime);
-                    }
-                },
-                onend: nextSong,
-                onloaderror: (id, error) => {
-                    console.error('Error loading audio:', error);
-                    alert(`Error loading audio: ${playlist[currentSongIndex].title}. Please check the file path.`);
+                playBtn.style.display = 'none';
+                pauseBtn.style.display = 'inline-block';
+            },
+            onload: () => {
+                const duration = document.getElementById('duration');
+                duration.textContent = formatTime(sound.duration());
+                if (currentTime > 0) {
+                    sound.seek(currentTime);
                 }
-            });
-            sound.play();
-        }
-
-        function pauseSong() {
-            if (sound) {
-                currentTime = sound.seek();
-                sound.pause();
+            },
+            onend: nextSong,
+            onloaderror: (id, error) => {
+                console.error('Error loading audio:', error);
+                alert(`Error loading audio: ${playlist[currentSongIndex].title}. Please check the file path.`);
             }
-            playBtn.style.display = 'inline-block';
-            pauseBtn.style.display = 'none';
-        }
-
-        function nextSong() {
-            currentSongIndex = (currentSongIndex + 1) % playlist.length;
-            updatePlayerInfo();
-            playSong();
-        }
-
-        function prevSong() {
-            currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
-            updatePlayerInfo();
-            playSong();
-        }
-
-        const playBtn = document.getElementById('playBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const prevBtn = document.getElementById('prevBtn');
-
-        playBtn.addEventListener('click', playSong);
-        pauseBtn.addEventListener('click', pauseSong);
-        nextBtn.addEventListener('click', nextSong);
-        prevBtn.addEventListener('click', prevSong);
-
-        document.getElementById('progressContainer').addEventListener('click', (e) => {
-            const progressContainer = e.target;
-            const width = progressContainer.clientWidth;
-            const clickX = e.offsetX;
-            const duration = sound.duration();
-
-            sound.seek((clickX / width) * duration);
         });
+        sound.play();
+    }
 
-        function showPhoto(index) {
-            const photoGallery = document.getElementById('photoGallery');
-            photoGallery.innerHTML = '';
-            const photo = document.createElement('img');
-            photo.src = photos[index];
-            photo.classList.add('photo');
-            photoGallery.appendChild(photo);
-
-            setTimeout(() => {
-                photo.classList.add('active');
-            }, 10);
+    function pauseSong() {
+        if (sound) {
+            currentTime = sound.seek();
+            sound.pause();
         }
+        playBtn.style.display = 'inline-block';
+        pauseBtn.style.display = 'none';
+    }
 
-        function nextPhoto() {
-            currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
-            showPhoto(currentPhotoIndex);
-        }
-
-        setInterval(nextPhoto, 5000);
-        showPhoto(currentPhotoIndex);
-
-        const envelopeBtn = document.getElementById('envelopeBtn');
-        let currentLetterIndex = 0;
-
-        envelopeBtn.addEventListener('click', () => {
-            document.getElementById('letterText').textContent = letters[currentLetterIndex];
-            document.getElementById('letterModal').style.display = 'block';
-            currentLetterIndex = (currentLetterIndex + 1) % letters.length;
-        });
-
-        document.querySelector('.modal .close').addEventListener('click', () => {
-            document.getElementById('letterModal').style.display = 'none';
-        });
-
+    function nextSong() {
+        currentTime = 0;
+        currentSongIndex = (currentSongIndex + 1) % playlist.length;
         updatePlayerInfo();
-    </script>
+        playSong();
+    }
+
+    function prevSong() {
+        currentTime = 0;
+        currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+        updatePlayerInfo();
+        playSong();
+    }
+
+    const playBtn = document.getElementById('playBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+
+    playBtn.addEventListener('click', playSong);
+    pauseBtn.addEventListener('click', pauseSong);
+    nextBtn.addEventListener('click', nextSong);
+    prevBtn.addEventListener('click', prevSong);
+
+    document.getElementById('progressContainer').addEventListener('click', (e) => {
+        const progressContainer = e.target;
+        const width = progressContainer.clientWidth;
+        const clickX = e.offsetX;
+        const duration = sound.duration();
+
+        sound.seek((clickX / width) * duration);
+    });
+
+    function showPhoto(index) {
+        const photoGallery = document.getElementById('photoGallery');
+        photoGallery.innerHTML = '';
+        const photo = document.createElement('img');
+        photo.src = photos[index];
+        photo.classList.add('photo');
+        photoGallery.appendChild(photo);
+
+        setTimeout(() => {
+            photo.classList.add('active');
+        }, 10);
+    }
+
+    function nextPhoto() {
+        currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
+        showPhoto(currentPhotoIndex);
+    }
+
+    setInterval(nextPhoto, 5000);
+    showPhoto(currentPhotoIndex);
+
+    const envelopeBtn = document.getElementById('envelopeBtn');
+    let currentLetterIndex = 0;
+
+    envelopeBtn.addEventListener('click', () => {
+        document.getElementById('letterText').textContent = letters[currentLetterIndex];
+        document.getElementById('letterModal').style.display = 'block';
+        currentLetterIndex = (currentLetterIndex + 1) % letters.length;
+    });
+
+    document.querySelector('.modal .close').addEventListener('click', () => {
+        document.getElementById('letterModal').style.display = 'none';
+    });
+
+    updatePlayerInfo();
+</script>
 </body>
 </html>
