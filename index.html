@@ -402,78 +402,6 @@
         </div>
     </div>
 
-    <!-- Floating Hearts -->
-    <!-- Line 1 -->
-    <div class="heart" style="left: 5%; animation-delay: 0s;"></div>
-    <div class="heart" style="left: 5%; animation-delay: 1s;"></div>
-    <div class="heart" style="left: 5%; animation-delay: 2s;"></div>
-    <div class="heart" style="left: 5%; animation-delay: 3s;"></div>
-    <div class="heart" style="left: 5%; animation-delay: 4s;"></div>
-
-    <!-- Line 2 -->
-    <div class="heart" style="left: 15%; animation-delay: 0.5s;"></div>
-    <div class="heart" style="left: 15%; animation-delay: 1.5s;"></div>
-    <div class="heart" style="left: 15%; animation-delay: 2.5s;"></div>
-    <div class="heart" style="left: 15%; animation-delay: 3.5s;"></div>
-    <div class="heart" style="left: 15%; animation-delay: 4.5s;"></div>
-
-    <!-- Line 3 -->
-    <div class="heart" style="left: 25%; animation-delay: 1s;"></div>
-    <div class="heart" style="left: 25%; animation-delay: 2s;"></div>
-    <div class="heart" style="left: 25%; animation-delay: 3s;"></div>
-    <div class="heart" style="left: 25%; animation-delay: 4s;"></div>
-    <div class="heart" style="left: 25%; animation-delay: 5s;"></div>
-
-    <!-- Line 4 -->
-    <div class="heart" style="left: 35%; animation-delay: 1.5s;"></div>
-    <div class="heart" style="left: 35%; animation-delay: 2.5s;"></div>
-    <div class="heart" style="left: 35%; animation-delay: 3.5s;"></div>
-    <div class="heart" style="left: 35%; animation-delay: 4.5s;"></div>
-    <div class="heart" style="left: 35%; animation-delay: 5.5s;"></div>
-
-    <!-- Line 5 -->
-    <div class="heart" style="left: 45%; animation-delay: 2s;"></div>
-    <div class="heart" style="left: 45%; animation-delay: 3s;"></div>
-    <div class="heart" style="left: 45%; animation-delay: 4s;"></div>
-    <div class="heart" style="left: 45%; animation-delay: 5s;"></div>
-    <div class="heart" style="left: 45%; animation-delay: 6s;"></div>
-
-    <!-- Line 6 -->
-    <div class="heart" style="left: 55%; animation-delay: 2.5s;"></div>
-    <div class="heart" style="left: 55%; animation-delay: 3.5s;"></div>
-    <div class="heart" style="left: 55%; animation-delay: 4.5s;"></div>
-    <div class="heart" style="left: 55%; animation-delay: 5.5s;"></div>
-    <div class="heart" style="left: 55%; animation-delay: 6.5s;"></div>
-
-    <!-- Line 7 -->
-    <div class="heart" style="left: 65%; animation-delay: 3s;"></div>
-    <div class="heart" style="left: 65%; animation-delay: 4s;"></div>
-    <div class="heart" style="left: 65%; animation-delay: 5s;"></div>
-    <div class="heart" style="left: 65%; animation-delay: 6s;"></div>
-    <div class="heart" style="left: 65%; animation-delay: 7s;"></div>
-
-    <!-- Line 8 -->
-    <div class="heart" style="left: 75%; animation-delay: 3.5s;"></div>
-    <div class="heart" style="left: 75%; animation-delay: 4.5s;"></div>
-    <div class="heart" style="left: 75%; animation-delay: 5.5s;"></div>
-    <div class="heart" style="left: 75%; animation-delay: 6.5s;"></div>
-    <div class="heart" style="left: 75%; animation-delay: 7.5s;"></div>
-
-    <!-- Line 9 -->
-    <div class="heart" style="left: 85%; animation-delay: 4s;"></div>
-    <div class="heart" style="left: 85%; animation-delay: 5s;"></div>
-    <div class="heart" style="left: 85%; animation-delay: 6s;"></div>
-    <div class="heart" style="left: 85%; animation-delay: 7s;"></div>
-    <div class="heart" style="left: 85%; animation-delay: 8s;"></div>
-
-    <!-- Line 10 -->
-    <div class="heart" style="left: 95%; animation-delay: 4.5s;"></div>
-    <div class="heart" style="left: 95%; animation-delay: 5.5s;"></div>
-    <div class="heart" style="left: 95%; animation-delay: 6.5s;"></div>
-    <div class="heart" style="left: 95%; animation-delay: 7.5s;"></div>
-    <div class="heart" style="left: 95%; animation-delay: 8.5s;"></div>
-
-
     <script>
         function createHeart() {
             const heart = document.createElement('div');
@@ -489,7 +417,7 @@
         }
 
         // Create a new heart every 300ms
-        setInterval(createHeart, 300);
+        setInterval(createHeart, 500);
         
         const playlist = [
         { title: "在这座城市遗失了你", artist: "告五人", file: "在這座城市遺失了你.mp3" },
@@ -544,26 +472,33 @@
         }
 
         function playSong() {
-            if (sound) sound.stop();
-            sound = new Howl({
-                src: [playlist[currentSongIndex].file],
-                html5: true,
-                onplay: () => {
-                    requestAnimationFrame(updateProgressBar);
-                    playBtn.style.display = 'none';
-                    pauseBtn.style.display = 'inline-block';
-                },
-                onload: () => {
-                    const duration = document.getElementById('duration');
-                    duration.textContent = formatTime(sound.duration());
-                },
-                onend: nextSong,
-                onloaderror: (id, error) => {
-                    console.error('Error loading audio:', error);
-                    alert(`Error loading audio: ${playlist[currentSongIndex].title}. Please check the file path.`);
+            if (sound) {
+                if (sound.playing()) {
+                    return; // If already playing, do nothing
+                } else {
+                    sound.play(); // Resume from where it was paused
                 }
-            });
-            sound.play();
+            } else {
+                sound = new Howl({
+                    src: [playlist[currentSongIndex].file],
+                    html5: true,
+                    autoplay: true,
+                    onplay: () => {
+                        requestAnimationFrame(updateProgressBar);
+                        playBtn.style.display = 'none';
+                        pauseBtn.style.display = 'inline-block';
+                    },
+                    onload: () => {
+                        const duration = document.getElementById('duration');
+                        duration.textContent = formatTime(sound.duration());
+                    },
+                    onend: nextSong,
+                    onloaderror: (id, error) => {
+                        console.error('Error loading audio:', error);
+                        alert(`Error loading audio: ${playlist[currentSongIndex].title}. Please check the file path.`);
+                    }
+                });
+            }
         }
 
         function pauseSong() {
@@ -638,6 +573,14 @@
         });
 
         updatePlayerInfo();
+
+        function autoplay() {
+            playSong();
+        }
+
+        window.addEventListener('load', autoplay);
+
+
     </script>
 </body>
 </html>
