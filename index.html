@@ -466,6 +466,7 @@
             }
         }
         
+        
         function updatePlayerInfo() {
             document.getElementById('songTitle').textContent = playlist[currentSongIndex].title;
             document.getElementById('artistName').textContent = playlist[currentSongIndex].artist;
@@ -473,16 +474,11 @@
 
         function playSong() {
             if (sound) {
-                if (sound.playing()) {
-                    return;
-                } else {
-                    sound.play();
-                }
+                sound.play();
             } else {
                 sound = new Howl({
                     src: [playlist[currentSongIndex].file],
                     html5: true,
-                    autoplay: true,
                     onplay: () => {
                         requestAnimationFrame(updateProgressBar);
                         playBtn.style.display = 'none';
@@ -498,8 +494,8 @@
                         alert(`Error loading audio: ${playlist[currentSongIndex].title}. Please check the file path.`);
                     }
                 });
+                sound.play();
             }
-            updatePlayerInfo(); // Update player info when playing
         }
         
         function pauseSong() {
@@ -582,9 +578,27 @@
         });
 
         function initializePlayer() {
-            updatePlayerInfo(); // Update player info on initialization
-            playSong(); // Start playing the first song
+            updatePlayerInfo(); // Update player info immediately
+            
+            // Attempt to autoplay
+            playSong();
+            
+            // If autoplay fails, update UI to show play button
+            sound.once('playerror', function() {
+                playBtn.style.display = 'inline-block';
+                pauseBtn.style.display = 'none';
+            });
         }
+
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+
+        playBtn.addEventListener('click', playSong);
+        pauseBtn.addEventListener('click', pauseSong);
+        nextBtn.addEventListener('click', nextSong);
+        prevBtn.addEventListener('click', prevSong);
         
         window.addEventListener('load', () => {
             initializeHearts();
