@@ -408,16 +408,16 @@
             heart.classList.add('heart');
             heart.style.left = Math.random() * 100 + 'vw';
             heart.style.animationDuration = (Math.random() * 3 + 7) + 's'; // Between 7 and 10 seconds
+            heart.style.animationDelay = Math.random() * 5 + 's'; // Random delay up to 5 seconds
             document.body.appendChild(heart);
-
+        
             // Remove the heart after animation completes
             setTimeout(() => {
                 heart.remove();
-            }, 10000);
+            }, 15000); 
         }
-
-        // Create a new heart every 300ms
-        setInterval(createHeart, 500);
+        
+        setInterval(createHeart, 300); 
         
         const playlist = [
         { title: "在这座城市遗失了你", artist: "告五人", file: "在這座城市遺失了你.mp3" },
@@ -578,8 +578,17 @@
             playSong();
         }
 
-        window.addEventListener('load', autoplay);
+        window.addEventListener('load', () => {
+            initializeHearts();
+            autoplay(); 
+        });
 
+        function initializeHearts() {
+            // Create initial hearts
+            for (let i = 0; i < 10; i++) {
+                createHeart();
+            }
+        }
 
     </script>
 </body>
