@@ -543,13 +543,8 @@
             }
         }
 
-        let sound;
-        let currentTime = 0;
-        
         function playSong() {
-            if (sound) {
-                sound.stop();
-            }
+            if (sound) sound.stop();
             sound = new Howl({
                 src: [playlist[currentSongIndex].file],
                 html5: true,
@@ -561,9 +556,6 @@
                 onload: () => {
                     const duration = document.getElementById('duration');
                     duration.textContent = formatTime(sound.duration());
-                    if (currentTime > 0) {
-                        sound.seek(currentTime);
-                    }
                 },
                 onend: nextSong,
                 onloaderror: (id, error) => {
@@ -575,10 +567,7 @@
         }
 
         function pauseSong() {
-            if (sound) {
-                currentTime = sound.seek();
-                sound.pause();
-            }
+            if (sound) sound.pause();
             playBtn.style.display = 'inline-block';
             pauseBtn.style.display = 'none';
         }
