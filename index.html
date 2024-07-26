@@ -451,11 +451,6 @@
             return `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        function updatePlayerInfo() {
-            document.getElementById('songTitle').textContent = playlist[currentSongIndex].title;
-            document.getElementById('artistName').textContent = playlist[currentSongIndex].artist;
-        }
-
         function updateProgressBar() {
             const progressBar = document.getElementById('progressBar');
             const currentTime = document.getElementById('currentTime');
@@ -471,12 +466,17 @@
             }
         }
         
+        function updatePlayerInfo() {
+            document.getElementById('songTitle').textContent = playlist[currentSongIndex].title;
+            document.getElementById('artistName').textContent = playlist[currentSongIndex].artist;
+        }
+
         function playSong() {
             if (sound) {
                 if (sound.playing()) {
-                    return; // If already playing, do nothing
+                    return;
                 } else {
-                    sound.play(); // Resume from where it was paused
+                    sound.play();
                 }
             } else {
                 sound = new Howl({
@@ -499,8 +499,9 @@
                     }
                 });
             }
+            updatePlayerInfo(); // Update player info when playing
         }
-
+        
         function pauseSong() {
             if (sound) sound.pause();
             playBtn.style.display = 'inline-block';
@@ -580,34 +581,14 @@
             document.getElementById('letterModal').style.display = 'none';
         });
 
-        function autoplay() {
-            if (!sound) {
-                sound = new Howl({
-                    src: [playlist[currentSongIndex].file],
-                    html5: true,
-                    autoplay: true,
-                    onplay: () => {
-                        requestAnimationFrame(updateProgressBar);
-                        playBtn.style.display = 'none';
-                        pauseBtn.style.display = 'inline-block';
-                    },
-                    onload: () => {
-                        const duration = document.getElementById('duration');
-                        duration.textContent = formatTime(sound.duration());
-                    },
-                    onend: nextSong,
-                    onloaderror: (id, error) => {
-                        console.error('Error loading audio:', error);
-                        alert(`Error loading audio: ${playlist[currentSongIndex].title}. Please check the file path.`);
-                    }
-                });
-            }
-            updatePlayerInfo();
+        function initializePlayer() {
+            updatePlayerInfo(); // Update player info on initialization
+            playSong(); // Start playing the first song
         }
         
         window.addEventListener('load', () => {
             initializeHearts();
-            autoplay();
+            initializePlayer();
         });
 
     </script>
