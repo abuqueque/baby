@@ -409,30 +409,30 @@
             heart.style.left = Math.random() * 100 + 'vw';
             heart.style.animationDuration = (Math.random() * 3 + 7) + 's'; // Between 7 and 10 seconds
             document.body.appendChild(heart);
-
+        
             // Remove the heart after animation completes
             setTimeout(() => {
                 heart.remove();
             }, 10000);
         }
-
-        // Create a new heart every 300ms
+        
+        // Create a new heart every 500ms
         setInterval(createHeart, 500);
         
         const playlist = [
-        { title: "在这座城市遗失了你", artist: "告五人", file: "在這座城市遺失了你.mp3" },
-        { title: "女孩", artist: "韦礼安", file: "女孩.mp3" },
-        { title: "慢慢等", artist: "韦礼安", file: "慢慢等.mp3" },
-        { title: "地球上最浪漫的一首歌", artist: "黄鸿升", file: "地球上最浪漫的一首歌.mp3" },
-        { title: "不是因为天气晴朗才爱你", artist: "理想混蛋", file: "不是因為天氣晴朗才愛你.mp3" }
-    ];
-
+            { title: "在这座城市遗失了你", artist: "告五人", file: "在這座城市遺失了你.mp3" },
+            { title: "女孩", artist: "韦礼安", file: "女孩.mp3" },
+            { title: "慢慢等", artist: "韦礼安", file: "慢慢等.mp3" },
+            { title: "地球上最浪漫的一首歌", artist: "黄鸿升", file: "地球上最浪漫的一首歌.mp3" },
+            { title: "不是因为天气晴朗才爱你", artist: "理想混蛋", file: "不是因為天氣晴朗才愛你.mp3" }
+        ];
+        
         const photos = [
             "IMG_8273.JPEG",
             "image2.JPEG",
             "photo3.jpg"
         ];
-
+        
         const letters = [
             "My dearest,\n\nYour love fills my heart with joy every single day. From the moment I wake up to the moment I fall asleep, thoughts of you bring a smile to my face. You are the light that brightens even my darkest days, and I am so grateful to have you in my life.\n\nHappy birthday, my love. May this day be as special and wonderful as you are.\n\nForever yours,\n[Your Name]",
             
@@ -440,22 +440,22 @@
             
             "To my beautiful [Partner's Name],\n\nYour smile brightens my world in ways I never thought possible. It's the first thing I want to see every morning and the last thing I want to see every night. Your love has given my life new meaning and purpose.\n\nOn this special day, I want to remind you of how amazing you are. Your kindness, your strength, your passion – every part of you is perfect to me.\n\nHappy birthday, my love. I can't wait to celebrate many more with you.\n\nLove always,\n[Your Name]"
         ];
-
+        
         let currentSongIndex = 0;
         let sound;
         let currentPhotoIndex = 0;
-
+        
         function formatTime(secs) {
             const minutes = Math.floor(secs / 60);
             const seconds = Math.floor(secs % 60);
             return `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
-
+        
         function updateProgressBar() {
             const progressBar = document.getElementById('progressBar');
             const currentTime = document.getElementById('currentTime');
             const duration = document.getElementById('duration');
-
+        
             if (sound) {
                 const seek = sound.seek() || 0;
                 const totalDuration = sound.duration() || 0;
@@ -466,19 +466,23 @@
             }
         }
         
-        
         function updatePlayerInfo() {
             document.getElementById('songTitle').textContent = playlist[currentSongIndex].title;
             document.getElementById('artistName').textContent = playlist[currentSongIndex].artist;
         }
-
+        
         function playSong() {
             if (sound) {
-                sound.play();
+                if (sound.playing()) {
+                    return;
+                } else {
+                    sound.play();
+                }
             } else {
                 sound = new Howl({
                     src: [playlist[currentSongIndex].file],
                     html5: true,
+                    autoplay: true,
                     onplay: () => {
                         requestAnimationFrame(updateProgressBar);
                         playBtn.style.display = 'none';
@@ -494,8 +498,8 @@
                         alert(`Error loading audio: ${playlist[currentSongIndex].title}. Please check the file path.`);
                     }
                 });
-                sound.play();
             }
+            updatePlayerInfo(); // Update player info when playing
         }
         
         function pauseSong() {
@@ -528,21 +532,21 @@
         const pauseBtn = document.getElementById('pauseBtn');
         const nextBtn = document.getElementById('nextBtn');
         const prevBtn = document.getElementById('prevBtn');
-
+        
         playBtn.addEventListener('click', playSong);
         pauseBtn.addEventListener('click', pauseSong);
         nextBtn.addEventListener('click', nextSong);
         prevBtn.addEventListener('click', prevSong);
-
+        
         document.getElementById('progressContainer').addEventListener('click', (e) => {
             const progressContainer = e.target;
             const width = progressContainer.clientWidth;
             const clickX = e.offsetX;
             const duration = sound.duration();
-
+        
             sound.seek((clickX / width) * duration);
         });
-
+        
         function showPhoto(index) {
             const photoGallery = document.getElementById('photoGallery');
             photoGallery.innerHTML = '';
@@ -550,58 +554,39 @@
             photo.src = photos[index];
             photo.classList.add('photo');
             photoGallery.appendChild(photo);
-
+        
             setTimeout(() => {
                 photo.classList.add('active');
             }, 10);
         }
-
+        
         function nextPhoto() {
             currentPhotoIndex = (currentPhotoIndex + 1) % photos.length;
             showPhoto(currentPhotoIndex);
         }
-
+        
         setInterval(nextPhoto, 5000);
         showPhoto(currentPhotoIndex);
-
+        
         const envelopeBtn = document.getElementById('envelopeBtn');
         let currentLetterIndex = 0;
-
+        
         envelopeBtn.addEventListener('click', () => {
             document.getElementById('letterText').textContent = letters[currentLetterIndex];
             document.getElementById('letterModal').style.display = 'block';
             currentLetterIndex = (currentLetterIndex + 1) % letters.length;
         });
-
+        
         document.querySelector('.modal .close').addEventListener('click', () => {
             document.getElementById('letterModal').style.display = 'none';
         });
-
+        
         function initializePlayer() {
-            updatePlayerInfo(); // Update player info immediately
-            
-            // Attempt to autoplay
-            playSong();
-            
-            // If autoplay fails, update UI to show play button
-            sound.once('playerror', function() {
-                playBtn.style.display = 'inline-block';
-                pauseBtn.style.display = 'none';
-            });
+            updatePlayerInfo(); // Update player info on initialization
+            playSong(); // Start playing the first song
         }
-
-        const playBtn = document.getElementById('playBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const prevBtn = document.getElementById('prevBtn');
-
-        playBtn.addEventListener('click', playSong);
-        pauseBtn.addEventListener('click', pauseSong);
-        nextBtn.addEventListener('click', nextSong);
-        prevBtn.addEventListener('click', prevSong);
         
         window.addEventListener('load', () => {
-            initializeHearts();
             initializePlayer();
         });
 
